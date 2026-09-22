@@ -2,6 +2,13 @@ package CrazyCaffeine;
 
 import student.TestCase;
 
+// -------------------------------------------------------------------------
+/**
+ * testing validation to see if it works correctly
+ * 
+ * @author shafiursarker
+ * @version Sep 22, 2026
+ */
 public class ValidationTest
     extends TestCase
 {
