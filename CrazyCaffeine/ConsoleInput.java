@@ -1,4 +1,4 @@
-package CrazyCaffine;
+package CrazyCaffeine;
 
 import java.util.Scanner;
 
