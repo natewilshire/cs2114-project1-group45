@@ -1,4 +1,4 @@
-package Github;
+package CrazyCaffeine;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -47,15 +47,15 @@ public class Main
         {
             System.out.println("\nEnter drink information.");
 
-            // R we still doing the preset drinks orrrr? 
+            // R we still doing the preset drinks orrrr?
             String drinkName = input.readDrinkName();
             String size = input.readSize();
             double caffeineAmount = input.readCaffeineAmount();
-            double timeConsumed = input.readTime(
-                "Time consumed (0 to less than 24): ");
+            double timeConsumed =
+                input.readTime("Time consumed (0 to less than 24): ");
 
-            Drink drink = new Drink(
-                drinkName, size, caffeineAmount, timeConsumed);
+            Drink drink =
+                new Drink(drinkName, size, caffeineAmount, timeConsumed);
 
             drinks.add(drink);
 
@@ -68,18 +68,16 @@ public class Main
         }
         while (addAnother);
 
-        double requestedTime = input.readTime(
-            "\nWhat time do you want to check? ");
+        double requestedTime =
+            input.readTime("\nWhat time do you want to check? ");
 
-        while (!validation.validRequestedTime(
-            requestedTime, latestConsumed))
+        while (!validation.validRequestedTime(requestedTime, latestConsumed))
         {
             System.out.println(
                 "Rejected: the check time must be at or after "
                     + "your latest drink at " + latestConsumed + ".");
 
-            requestedTime = input.readTime(
-                "What time do you want to check? ");
+            requestedTime = input.readTime("What time do you want to check? ");
         }
 
         System.out.println("\n--- User Information ---");
@@ -98,21 +96,19 @@ public class Main
             System.out.println("\nDrink " + (i + 1) + ":");
             System.out.println("Name: " + drink.getDrinkName());
             System.out.println("Size: " + drink.getSize());
-            System.out.println(
-                "Caffeine: " + drink.getCaffeineAmount() + " mg");
-            System.out.println(
-                "Time consumed: " + drink.getTimeConsumed());
+            System.out
+                .println("Caffeine: " + drink.getCaffeineAmount() + " mg");
+            System.out.println("Time consumed: " + drink.getTimeConsumed());
 
             totalConsumed += drink.getCaffeineAmount();
         }
 
-        System.out.printf(
-            "%nTotal caffeine consumed: %.2f mg%n", totalConsumed);
+        System.out
+            .printf("%nTotal caffeine consumed: %.2f mg%n", totalConsumed);
         System.out.println("Requested check time: " + requestedTime);
 
         // STILL NEED THE CaffeineCalculator TO DO THE FINAL THINGS
-        System.out.println(
-            "Caffeine remaining is not calculated yet.");
+        System.out.println("Caffeine remaining is not calculated yet.");
 
         scanner.close();
     }
