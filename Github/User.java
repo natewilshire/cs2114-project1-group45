@@ -1,3 +1,4 @@
+package Github;
 public class User
 {
     private String sex;

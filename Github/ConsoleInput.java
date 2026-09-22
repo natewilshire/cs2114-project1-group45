@@ -4,17 +4,26 @@ import java.util.Scanner;
 
 // -------------------------------------------------------------------------
 /**
- * Write a one-sentence summary of your class here. Follow it with additional
- * details about its purpose, what abstraction it represents, and how to use it.
+ * reads input from the console and keeps asking until the validation class
+ * accepts the input which would the correct format. should tell the reason for
+ * rejection
  * 
  * @author shafiursarker
  * @version Sep 22, 2026
  */
 public class ConsoleInput
 {
-    private final Scanner scanner;
-    private final Validation validation;
+    private Scanner scanner;
+    private Validation validation;
 
+    /**
+     * creates a new ConsoleInput
+     *
+     * @param scanner
+     *            the scanner to read input from
+     * @param validation
+     *            the validation object used to check input
+     */
     public ConsoleInput(Scanner scanner, Validation validation)
     {
         this.scanner = scanner;
@@ -22,183 +31,234 @@ public class ConsoleInput
     }
 
 
+    /**
+     * asks for the user's sex until it is valid
+     *
+     * @return the sex in lowercase
+     */
     public String readSex()
     {
-        while (true)
+        System.out.print("Sex (male/female): ");
+        String sex = scanner.nextLine();
+        while (!validation.validSex(sex))
         {
-            String input = prompt("Sex (male/female): ");
-            if (validation.validSex(input))
-                return validation.normalize(input);
-            reject(input, "please type male or female");
+            System.out.println("Rejected: please type male or female.");
+            System.out.print("Sex (male/female): ");
+            sex = scanner.nextLine();
         }
+        return sex.trim().toLowerCase();
     }
 
 
+    /**
+     * asks for the user's height until it is valid
+     *
+     * @return the height in inches
+     */
     public double readHeight()
     {
-        return readPositiveNumber("Height in inches: ", "height");
+        double height = readNumber("Height in inches: ");
+        while (!validation.validHeight(height))
+        {
+            System.out.println(
+                "Rejected: height must be greater than 0 and at most 1000.");
+            height = readNumber("Height in inches: ");
+        }
+        return height;
     }
 
 
+    /**
+     * asks for the user's weight until it is valid
+     *
+     * @return the weight in pounds
+     */
     public double readWeight()
     {
-        return readPositiveNumber("Weight in pounds: ", "weight");
+        double weight = readNumber("Weight in pounds: ");
+        while (!validation.validWeight(weight))
+        {
+            System.out.println(
+                "Rejected: weight must be greater than 0 and at most 1000.");
+            weight = readNumber("Weight in pounds: ");
+        }
+        return weight;
     }
 
 
+    /**
+     * asks for the caffeine in a drink until it is valid
+     *
+     * @return the caffeine amount in mg
+     */
     public double readCaffeineAmount()
     {
-        return readPositiveNumber(
-            "Caffeine in the drink (mg): ",
-            "caffeine amount");
+        double caffeine = readNumber("Caffeine in the drink (mg): ");
+        while (!validation.validCaffeineAmount(caffeine))
+        {
+            System.out.println(
+                "Rejected: caffeine must be greater than 0 and at most 1000.");
+            caffeine = readNumber("Caffeine in the drink (mg): ");
+        }
+        return caffeine;
     }
 
 
+    /**
+     * asks for a drink name until it is not blank
+     *
+     * @return the drink name
+     */
     public String readDrinkName()
     {
-        while (true)
+        System.out.print("Drink name: ");
+        String name = scanner.nextLine();
+        while (!validation.validDrinkName(name))
         {
-            String input = prompt("Drink name: ");
-            if (validation.validDrinkName(input))
-                return input.trim();
-            if (validation.isBlank(input))
-                reject(input, "drink name can't be blank");
-            else
-                reject(
-                    input,
-                    "drink name must be " + Validation.MAX_NAME_LENGTH
-                        + " characters or less");
+            System.out.println("Rejected: drink name can't be blank.");
+            System.out.print("Drink name: ");
+            name = scanner.nextLine();
         }
+        return name.trim();
     }
 
 
+    /**
+     * asks for a drink size until it is valid
+     *
+     * @return the size in lowercase
+     */
     public String readSize()
     {
-        while (true)
+        System.out.print("Size (small/medium/large): ");
+        String size = scanner.nextLine();
+        while (!validation.validSize(size))
         {
-            String input = prompt("Size (small/medium/large): ");
-            if (validation.validSize(input))
-                return validation.normalize(input);
-            reject(input, "size must be small, medium, or large");
+            System.out
+                .println("Rejected: size must be small, medium, or large.");
+            System.out.print("Size (small/medium/large): ");
+            size = scanner.nextLine();
         }
+        return size.trim().toLowerCase();
     }
 
-    // Reads a clock time such as 14:30 or 14.5
 
-
+    /**
+     * asks for a time until it is valid. Times use a 24-hour clock
+     *
+     * @param message
+     *            the question to show the user
+     * @return the time
+     */
     public double readTime(String message)
     {
-        while (true)
+        double time = readNumber(message);
+        while (!validation.validTime(time))
         {
-            String input = prompt(message);
-            Double time = validation.parseTime(input);
-            if (time == null)
-            {
-                reject(input, "enter a time like 14:30 or 14.5");
-            }
-            else if (!validation.validTime(time))
-            {
-                reject(input, "time must be between 0:00 and 23:59");
-            }
-            else
-            {
-                return time;
-            }
+            System.out
+                .println("Rejected: time must be at least 0 and less than 24.");
+            time = readNumber(message);
         }
+        return time;
     }
 
-    // Reads the time to check, which can't be before the earliest drink
 
-
+    /**
+     * asks for the time to check until it is valid and not before the first
+     * drink
+     *
+     * @param earliestConsumed
+     *            the time of the first drink
+     * @return the time to check
+     */
     public double readRequestedTime(double earliestConsumed)
     {
-        while (true)
+        String message = "What time do you want to check (e.g. 18)? ";
+        double time = readTime(message);
+        while (!validation.validRequestedTime(time, earliestConsumed))
         {
-            double time =
-                readTime("What time do you want to check (e.g. 18:00)? ");
-            if (validation.validRequestedTime(time, earliestConsumed))
-                return time;
             System.out.println(
-                "  Rejected: that's before your first drink at "
-                    + validation.formatTime(earliestConsumed) + ". Try again.");
+                "Rejected: that is before your first drink at "
+                    + earliestConsumed + ".");
+            time = readTime(message);
         }
+        return time;
     }
 
-    // Reads a menu number from 1 to max
 
-
+    /**
+     * asks for a menu choice until it is between 1 and max
+     *
+     * @param message
+     *            the question to show the user
+     * @param max
+     *            the highest menu number
+     * @return the menu choice
+     */
     public int readMenuChoice(String message, int max)
     {
+        System.out.print(message);
         while (true)
         {
-            String input = prompt(message);
-            Double n = validation.parseNumber(input);
-            if (n != null && n == Math.floor(n) && n >= 1 && n <= max)
-                return n.intValue();
-            reject(input, "pick a number from 1 to " + max);
-        }
-    }
-
-
-    public boolean readYesNo(String message)
-    {
-        while (true)
-        {
-            String input = validation.normalize(prompt(message));
-            if (input.equals("y") || input.equals("yes"))
-                return true;
-            if (input.equals("n") || input.equals("no"))
-                return false;
-            reject(input, "please type y or n");
-        }
-    }
-
-
-    private double readPositiveNumber(String message, String fieldName)
-    {
-        while (true)
-        {
-            String input = prompt(message);
-            Double value = validation.parseNumber(input);
-            if (value == null)
+            if (scanner.hasNextInt())
             {
-                reject(input, fieldName + " must be a number");
-            }
-            else if (value <= 0)
-            {
-                reject(input, fieldName + " must be greater than zero");
-            }
-            else if (value > Validation.MAX_VALUE)
-            {
-                reject(
-                    input,
-                    fieldName + " is unreasonably large (max "
-                        + (int)Validation.MAX_VALUE + ")");
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                if (choice >= 1 && choice <= max)
+                {
+                    return choice;
+                }
             }
             else
             {
-                return value;
+                scanner.nextLine();
             }
+            System.out
+                .println("Rejected: pick a number from 1 to " + max + ".");
+            System.out.print(message);
         }
     }
 
 
-    private String prompt(String message)
+    /**
+     * asks a yes or no question until the user types y or n
+     *
+     * @param message
+     *            the question to show the user
+     * @return true for yes, false for no
+     */
+    public boolean readYesNo(String message)
     {
         System.out.print(message);
-        if (!scanner.hasNextLine())
+        String answer = scanner.nextLine().trim().toLowerCase();
+        while (!answer.equals("y") && !answer.equals("n"))
         {
-            throw new IllegalStateException("Input ended unexpectedly.");
+            System.out.println("Rejected: please type y or n.");
+            System.out.print(message);
+            answer = scanner.nextLine().trim().toLowerCase();
         }
-        return scanner.nextLine();
+        return answer.equals("y");
     }
 
 
-    private void reject(String input, String reason)
+    /**
+     * asks for a number until the user types one
+     *
+     * @param message
+     *            the question to show the user
+     * @return the number the user typed
+     */
+    private double readNumber(String message)
     {
-        String shown =
-            validation.isBlank(input) ? "(blank)" : "\"" + input.trim() + "\"";
-        System.out
-            .println("  Rejected " + shown + ": " + reason + ". Try again.");
+        System.out.print(message);
+        while (!scanner.hasNextDouble())
+        {
+            System.out.println("Rejected: please enter a number.");
+            scanner.nextLine();
+            System.out.print(message);
+        }
+        double number = scanner.nextDouble();
+        scanner.nextLine();
+        return number;
     }
 }
