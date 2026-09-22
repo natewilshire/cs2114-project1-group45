@@ -47,30 +47,29 @@ public class Main
         {
             System.out.println("\nEnter drink information.");
 
-            // R we still doing the preset drinks orrrr?
-            String drinkName = input.readDrinkName();
-            String size = input.readSize();
-            double caffeineAmount = input.readCaffeineAmount();
-            double timeConsumed =
-                input.readTime("Time consumed (0 to less than 24): ");
-
-            Drink drink =
-                new Drink(drinkName, size, caffeineAmount, timeConsumed);
+            Drink drink = selectDrink(input);
 
             drinks.add(drink);
 
-            if (timeConsumed > latestConsumed)
+            if (drink.getTimeConsumed() > latestConsumed)
             {
-                latestConsumed = timeConsumed;
+                latestConsumed = drink.getTimeConsumed();
             }
 
             addAnother = input.readYesNo("Add another drink? (y/n): ");
         }
         while (addAnother);
 
-        double requestedTime =
-            input.readTime("\nWhat time do you want to check? ");
+        double requestedTime = input.readRequestedTime(latestConsumed);
 
+        while (!validation.validRequestedTime(requestedTime, latestConsumed))
+        {
+            System.out.println(
+                "Rejected: the check time must be at or after "
+                    + "your latest drink at " + latestConsumed + ".");
+
+            requestedTime = input.readTime("What time do you want to check? ");
+        }
         while (!validation.validRequestedTime(requestedTime, latestConsumed))
         {
             System.out.println(
@@ -107,9 +106,63 @@ public class Main
             .printf("%nTotal caffeine consumed: %.2f mg%n", totalConsumed);
         System.out.println("Requested check time: " + requestedTime);
 
-        // STILL NEED THE CaffeineCalculator TO DO THE FINAL THINGS
-        System.out.println("Caffeine remaining is not calculated yet.");
+        double remaining = CaffeineCalculator
+            .calculateTotalCaffeineRemaining(drinks, requestedTime);
+
+        System.out.printf(
+            "Caffeine remaining at %.2f: %.2f mg%n",
+            requestedTime,
+            remaining);
 
         scanner.close();
+    }
+
+
+    // ----------------------------------------------------------
+    /**
+     * lets the user pick a preset drink or enter their own, then asks for size
+     * and time consumed
+     *
+     * @param input
+     *            the ConsoleInput to read from
+     * @return the drink the user entered
+     */
+    private static Drink selectDrink(ConsoleInput input)
+    {
+        String[] presetNames =
+            { "Coffee", "Espresso Shot", "Black Tea", "Energy Drink", "Cola" };
+        double[] presetCaffeine = { 95, 63, 47, 80, 34 };
+
+        System.out.println("Choose a drink:");
+        for (int i = 0; i < presetNames.length; i++)
+        {
+            System.out.println(
+                (i + 1) + ". " + presetNames[i] + " (" + presetCaffeine[i]
+                    + " mg)");
+        }
+        System.out.println((presetNames.length + 1) + ". Enter a custom drink");
+
+        int choice =
+            input.readMenuChoice("Pick a number: ", presetNames.length + 1);
+
+        String drinkName;
+        double caffeineAmount;
+
+        if (choice == presetNames.length + 1)
+        {
+            drinkName = input.readDrinkName();
+            caffeineAmount = input.readCaffeineAmount();
+        }
+        else
+        {
+            drinkName = presetNames[choice - 1];
+            caffeineAmount = presetCaffeine[choice - 1];
+        }
+
+        String size = input.readSize();
+        double timeConsumed =
+            input.readTime("Time consumed (0 to less than 24): ");
+
+        return new Drink(drinkName, size, caffeineAmount, timeConsumed);
     }
 }
