@@ -1,4 +1,5 @@
-package Github;
+package CrazyCaffine;
+
 // -------------------------------------------------------------------------
 /**
  * Stores the user's sex, height, and weight for the caffeine calculation.

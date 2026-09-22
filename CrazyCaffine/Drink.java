@@ -1,4 +1,5 @@
-package Github;
+package CrazyCaffine;
+
 public class Drink
 {
     private String drinkName;
@@ -6,8 +7,11 @@ public class Drink
     private double caffeineAmount;
     private double timeConsumed;
 
-
-    public Drink(String drinkName, String size, double caffeineAmount, double timeConsumed)
+    public Drink(
+        String drinkName,
+        String size,
+        double caffeineAmount,
+        double timeConsumed)
     {
         this.drinkName = drinkName;
         this.size = size;
